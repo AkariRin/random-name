@@ -4,5 +4,6 @@ module.exports = defineConfig({
 
   pwa: {
     name: "随机点名器",
+    themeColor: "#FF0000",
   },
 });

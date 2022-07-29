@@ -1,10 +1,16 @@
 <template>
   <v-container>
+    <current-list :list="list.current"></current-list>
+    <v-row>
+      <v-col cols="12">
+        <v-spacer></v-spacer>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="4" offset="2">
         <v-select
           v-model="global.settings.selected"
-          :items="list.list_selector"
+          :items="list.selector"
           :value="global.settings.selected"
           label="选择名单"
         ></v-select>
@@ -13,24 +19,44 @@
     <v-row>
       <v-col cols="4" offset="2">
         <v-radio-group v-model="global.settings.mode" row mandatory>
+          <template v-slot:append>
+            <icon-tip text="a" location="top"></icon-tip>
+          </template>
           <v-radio label="单抽" value="0"></v-radio>
           <v-radio label="滚动" value="1"></v-radio>
           <v-radio label="批量" value="2"></v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="2">
-        <v-switch v-model="global.settings.repeat"></v-switch>
+      <v-col cols="4" v-show="global.settings.mode === '2'"></v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="8" offset="2">
+        <v-btn v-if="global.settings.mode === '0'" block>a</v-btn>
+        <v-btn v-if="global.settings.mode === '1'" block>b</v-btn>
+        <v-btn v-if="global.settings.mode === '2'" block>c</v-btn>
       </v-col>
-      <v-col cols="4" v-if="global.settings.mode === '2'"> </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <result-display></result-display>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
 import _ from "lodash";
+import iconTip from "@/components/iconTip";
+import currentList from "@/components/currentList";
+import resultDisplay from "@/components/resultDisplay";
 
 export default {
   name: "HomeView",
+  components: {
+    iconTip,
+    currentList,
+    resultDisplay,
+  },
   data: () => ({
     //全局数据，与localstorage同步
     global: {
@@ -40,6 +66,8 @@ export default {
         batch_count: 0,
         selected: "ListA",
         repeat: false,
+        //自动去重
+        unique: true,
       },
       list: {
         ListA: ["PersonA", "PersonB", "PersonC"],
@@ -50,7 +78,7 @@ export default {
       //当前列表内容
       current: Array,
       //列表选择器
-      list_selector: [],
+      selector: [],
     },
     //组件控制器
     componentController: {},
@@ -76,7 +104,7 @@ export default {
     }
     //加载当前列表与列表选择器
     this.list.current = this.global.list[this.global.settings.selected];
-    this.list.list_selector = _.keysIn(this.global.list);
+    this.list.selector = _.keysIn(this.global.list);
   },
 };
 </script>

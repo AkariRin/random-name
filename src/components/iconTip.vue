@@ -1,7 +1,7 @@
 <template>
-  <v-tooltip>
+  <v-tooltip :[location]="true">
     <template v-slot:activator="{ on, attrs }">
-      <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
+      <v-icon v-bind="attrs" v-on="on" small>mdi-help-circle</v-icon>
     </template>
     <span>{{ text }}</span>
   </v-tooltip>
