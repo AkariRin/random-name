@@ -2470,6 +2470,11 @@ core-js-compat@^3.21.0, core-js-compat@^3.22.1, core-js-compat@^3.8.3:
     browserslist "^4.21.2"
     semver "7.0.0"
 
+core-js@^3.24.0:
+  version "3.24.0"
+  resolved "https://registry.npmmirror.com/core-js/-/core-js-3.24.0.tgz#4928d4e99c593a234eb1a1f9abd3122b04d3ac57"
+  integrity sha512-IeOyT8A6iK37Ep4kZDD423mpi6JfPRoPUdQwEWYiGolvn4o6j2diaRzNfDfpTdu3a5qMbrGUzKUpYpRY8jXCkQ==
+
 core-js@^3.8.3:
   version "3.23.5"
   resolved "https://registry.npmmirror.com/core-js/-/core-js-3.23.5.tgz#1f82b0de5eece800827a2f59d597509c67650475"
@@ -6363,10 +6368,10 @@ vue@^2.6.14:
     "@vue/compiler-sfc" "2.7.8"
     csstype "^3.1.0"
 
-vuetify-loader@^1.7.0:
-  version "1.9.1"
-  resolved "https://registry.npmmirror.com/vuetify-loader/-/vuetify-loader-1.9.1.tgz#9cea0d0ce72a7fe7324ec324d2290a651afdcc9c"
-  integrity sha512-JQMDkksAw1Jrq3gSxCXipOAdTjpcjaadFQD0biBTCxo4/sbMxvSy3a4qOqxNui0KbBymSvzuC5eAgU5pd7oixw==
+vuetify-loader@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.npmmirror.com/vuetify-loader/-/vuetify-loader-1.9.2.tgz#adcadac71c6d9b24bde42a5b81dfda1871f73f81"
+  integrity sha512-8PP2w7aAs/rjA+Izec6qY7sHVb75MNrGQrDOTZJ5IEnvl+NiFhVpU2iWdRDZ3eMS842cWxSWStvkr+KJJKy+Iw==
   dependencies:
     acorn "^8.4.1"
     acorn-walk "^8.2.0"
