@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <current-list :list="list.current"></current-list>
     <v-row>
       <v-col cols="12">
         <v-spacer></v-spacer>
@@ -14,6 +13,9 @@
           :value="global.settings.selected"
           label="选择名单"
         ></v-select>
+      </v-col>
+      <v-col cols="2">
+        <current-list :list="list.current"></current-list>
       </v-col>
     </v-row>
     <v-row>
@@ -31,14 +33,55 @@
     </v-row>
     <v-row>
       <v-col cols="8" offset="2">
-        <v-btn v-if="global.settings.mode === '0'" block>a</v-btn>
-        <v-btn v-if="global.settings.mode === '1'" block>b</v-btn>
-        <v-btn v-if="global.settings.mode === '2'" block>c</v-btn>
+        <info-panel></info-panel>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="8" offset="2">
+        <v-btn
+          v-if="global.settings.mode === '0'"
+          color="blue"
+          block
+          @click="random()"
+          >开始单抽</v-btn
+        >
+        <v-btn
+          v-else-if="
+            global.settings.mode === '1' &&
+            componentController.isRunning === false
+          "
+          color="blue"
+          block
+          @click="startRunning()"
+          >开始单抽</v-btn
+        >
+        <v-btn
+          v-else-if="
+            global.settings.mode === '1' &&
+            componentController.isRunning === true
+          "
+          color="red"
+          block
+          @click="random()"
+          >停止</v-btn
+        >
+        <v-btn
+          v-else-if="global.settings.mode === '2'"
+          color="blue"
+          block
+          @click="randomBatch()"
+          >开始批量抽取</v-btn
+        >
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <result-display></result-display>
+        <result-display
+          :result="result"
+          :list="list.current"
+          :is-batch="componentController.isBatch"
+          :is-running="componentController.isRunning"
+        ></result-display>
       </v-col>
     </v-row>
   </v-container>
@@ -49,6 +92,7 @@ import _ from "lodash";
 import iconTip from "@/components/iconTip";
 import currentList from "@/components/currentList";
 import resultDisplay from "@/components/resultDisplay";
+import infoPanel from "@/components/infoPanel";
 
 export default {
   name: "HomeView",
@@ -56,6 +100,7 @@ export default {
     iconTip,
     currentList,
     resultDisplay,
+    infoPanel,
   },
   data: () => ({
     //全局数据，与localstorage同步
@@ -65,7 +110,7 @@ export default {
         mode: "0",
         batch_count: 0,
         selected: "ListA",
-        repeat: false,
+        allowRepeat: false,
         //自动去重
         unique: true,
       },
@@ -81,12 +126,38 @@ export default {
       selector: [],
     },
     //组件控制器
-    componentController: {},
+    componentController: {
+      batchDialog: false,
+      isBatch: false,
+      isRunning: false,
+    },
     //点名结果
-    result: "",
+    result: "?",
   }),
   methods: {
-    random() {},
+    random() {
+      this.componentController.isBatch = false;
+      this.result = _.sample(this.list.current);
+      this.componentController.isRunning = false;
+      if (!this.global.settings.allowRepeat) {
+        _.pull(this.list.current, this.result);
+      }
+    },
+    startRunning() {
+      this.componentController.isBatch = false;
+      this.componentController.isRunning = true;
+    },
+    randomBatch() {
+      this.componentController.isBatch = true;
+      this.componentController.isRunning = false;
+      this.result = _.sampleSize(
+        this.list.current,
+        this.global.settings.batch_count
+      );
+      if (!this.global.settings.allowRepeat) {
+        _.pullAll(this.list.current, this.result);
+      }
+    },
   },
   watch: {
     //与localstorage同步
@@ -102,7 +173,7 @@ export default {
     if (localStorage.getItem("data") !== null) {
       this.global = _.clone(JSON.parse(localStorage.getItem("data")));
     }
-    //加载当前列表与列表选择器
+    //加载当前列表、列表选择器
     this.list.current = this.global.list[this.global.settings.selected];
     this.list.selector = _.keysIn(this.global.list);
   },

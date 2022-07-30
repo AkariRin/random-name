@@ -1,11 +1,11 @@
 <template>
-  <div></div>
+  <div>{{ list }}{{ result }} {{ isBatch }} {{ isRunning }}</div>
 </template>
 
 <script>
 export default {
   name: "resultDisplay",
-  props: ["list", "result"],
+  props: ["list", "result", "isBatch", "isRunning"],
 };
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="1000" scrollable>
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on="on"></v-btn>
+      <v-btn v-bind="attrs" v-on="on">查看当前名单</v-btn>
     </template>
     <v-card tile>
       <v-card-title>当前名单</v-card-title>
