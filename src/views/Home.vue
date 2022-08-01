@@ -1,11 +1,6 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12">
-        <v-spacer></v-spacer>
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="4" offset="2">
         <v-select
           v-model="global.settings.selected"
@@ -14,8 +9,10 @@
           label="选择名单"
         ></v-select>
       </v-col>
-      <v-col cols="2">
+      <v-spacer></v-spacer>
+      <v-col cols="3">
         <current-list :list="list.current"></current-list>
+        <v-btn @click="$router.push('/list')">管理名单</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -127,9 +124,9 @@ export default {
     },
     //组件控制器
     componentController: {
-      batchDialog: false,
       isBatch: false,
       isRunning: false,
+      cacheSelectedList: "",
     },
     //点名结果
     result: "?",
@@ -164,6 +161,16 @@ export default {
     global: {
       handler(newValue) {
         localStorage.setItem("data", JSON.stringify(newValue));
+        //todo
+        if (
+          !_.isEqual(
+            newValue.settings.selected,
+            this.componentController.cacheSelectedList
+          )
+        ) {
+          this.list.current = this.global.list[newValue.settings.selected];
+        }
+        this.componentController.cacheSelectedList = newValue.settings.selected;
       },
       deep: true,
     },

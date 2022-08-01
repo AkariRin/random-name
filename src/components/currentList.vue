@@ -30,6 +30,13 @@ export default {
   beforeMount() {
     this.chips = this.list;
   },
+  watch: {
+    list: {
+      handler(newValue) {
+        this.chips = newValue;
+      },
+    },
+  },
 };
 </script>
 
