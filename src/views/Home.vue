@@ -1,32 +1,34 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row>
-      <v-col cols="4" offset="2">
+      <v-col cols="3" offset="2">
         <v-select
           v-model="global.settings.selected"
           :items="list.selector"
           :value="global.settings.selected"
           label="选择名单"
-        ></v-select>
+        >
+        </v-select>
       </v-col>
-      <v-spacer></v-spacer>
-      <v-col cols="3">
+      <v-col cols="2">
         <current-list :list="list.current"></current-list>
-        <v-btn @click="$router.push('/list')">管理名单</v-btn>
+        <v-btn @click="$router.push('/list')" class="ma-4">管理名单</v-btn>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="4" offset="2">
         <v-radio-group v-model="global.settings.mode" row mandatory>
-          <template v-slot:append>
-            <icon-tip text="a" location="top"></icon-tip>
-          </template>
           <v-radio label="单抽" value="0"></v-radio>
           <v-radio label="滚动" value="1"></v-radio>
           <v-radio label="批量" value="2"></v-radio>
         </v-radio-group>
       </v-col>
       <v-col cols="4" v-show="global.settings.mode === '2'"></v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="1" offset="2">
+        <v-switch></v-switch>
+      </v-col>
     </v-row>
     <v-row>
       <v-col cols="8" offset="2">
@@ -72,7 +74,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col cols="8" offset="2">
         <result-display
           :result="result"
           :list="list.current"
@@ -86,7 +88,7 @@
 
 <script>
 import _ from "lodash";
-import iconTip from "@/components/iconTip";
+//import iconTip from "@/components/iconTip";
 import currentList from "@/components/currentList";
 import resultDisplay from "@/components/resultDisplay";
 import infoPanel from "@/components/infoPanel";
@@ -94,7 +96,7 @@ import infoPanel from "@/components/infoPanel";
 export default {
   name: "HomeView",
   components: {
-    iconTip,
+    //iconTip,
     currentList,
     resultDisplay,
     infoPanel,
