@@ -5,8 +5,9 @@
     </template>
     <v-card tile>
       <v-card-title>当前名单</v-card-title>
+      <v-card-subtitle>人数：{{ count }}</v-card-subtitle>
       <v-card-text>
-        <v-chip v-for="c in chips" :key="c">{{ c }}</v-chip>
+        <v-chip v-for="c in chips" :key="c" class="ma-1">{{ c }}</v-chip>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
@@ -20,6 +21,8 @@
 </template>
 
 <script>
+import _ from "lodash";
+
 export default {
   name: "currentList",
   props: ["list"],
@@ -27,6 +30,11 @@ export default {
     chips: Array,
     dialog: false,
   }),
+  computed: {
+    count: function () {
+      return _.size(this.list);
+    },
+  },
   beforeMount() {
     this.chips = this.list;
   },

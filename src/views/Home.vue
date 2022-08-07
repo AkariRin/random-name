@@ -7,12 +7,14 @@
           :items="list.selector"
           :value="global.settings.selected"
           label="选择名单"
-        >
-        </v-select>
+        ></v-select>
       </v-col>
       <v-col cols="2">
         <current-list :list="list.current"></current-list>
-        <v-btn @click="$router.push('/list')" class="ma-4">管理名单</v-btn>
+        <v-btn @click="$router.push('/list')" class="ma-4">
+          <v-icon left>mdi-cog</v-icon>
+          管理名单
+        </v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -27,7 +29,7 @@
     </v-row>
     <v-row>
       <v-col cols="1" offset="2">
-        <v-switch></v-switch>
+        <v-switch v-model="global.settings.allowRepeat"></v-switch>
       </v-col>
     </v-row>
     <v-row>
@@ -42,26 +44,27 @@
           color="blue"
           block
           @click="random()"
+          dark
           >开始单抽</v-btn
         >
         <v-btn
           v-else-if="
-            global.settings.mode === '1' &&
-            componentController.isRunning === false
+            global.settings.mode === '1' && componentCtl.isRunning === false
           "
           color="blue"
           block
           @click="startRunning()"
+          dark
           >开始单抽</v-btn
         >
         <v-btn
           v-else-if="
-            global.settings.mode === '1' &&
-            componentController.isRunning === true
+            global.settings.mode === '1' && componentCtl.isRunning === true
           "
           color="red"
           block
           @click="random()"
+          dark
           >停止</v-btn
         >
         <v-btn
@@ -69,6 +72,7 @@
           color="blue"
           block
           @click="randomBatch()"
+          dark
           >开始批量抽取</v-btn
         >
       </v-col>
@@ -78,8 +82,8 @@
         <result-display
           :result="result"
           :list="list.current"
-          :is-batch="componentController.isBatch"
-          :is-running="componentController.isRunning"
+          :is-batch="componentCtl.isBatch"
+          :is-running="componentCtl.isRunning"
         ></result-display>
       </v-col>
     </v-row>
@@ -88,7 +92,6 @@
 
 <script>
 import _ from "lodash";
-//import iconTip from "@/components/iconTip";
 import currentList from "@/components/currentList";
 import resultDisplay from "@/components/resultDisplay";
 import infoPanel from "@/components/infoPanel";
@@ -96,7 +99,6 @@ import infoPanel from "@/components/infoPanel";
 export default {
   name: "HomeView",
   components: {
-    //iconTip,
     currentList,
     resultDisplay,
     infoPanel,
@@ -125,7 +127,7 @@ export default {
       selector: [],
     },
     //组件控制器
-    componentController: {
+    componentCtl: {
       isBatch: false,
       isRunning: false,
       cacheSelectedList: "",
@@ -135,20 +137,20 @@ export default {
   }),
   methods: {
     random() {
-      this.componentController.isBatch = false;
+      this.componentCtl.isBatch = false;
       this.result = _.sample(this.list.current);
-      this.componentController.isRunning = false;
+      this.componentCtl.isRunning = false;
       if (!this.global.settings.allowRepeat) {
         _.pull(this.list.current, this.result);
       }
     },
     startRunning() {
-      this.componentController.isBatch = false;
-      this.componentController.isRunning = true;
+      this.componentCtl.isBatch = false;
+      this.componentCtl.isRunning = true;
     },
     randomBatch() {
-      this.componentController.isBatch = true;
-      this.componentController.isRunning = false;
+      this.componentCtl.isBatch = true;
+      this.componentCtl.isRunning = false;
       this.result = _.sampleSize(
         this.list.current,
         this.global.settings.batch_count
@@ -167,12 +169,12 @@ export default {
         if (
           !_.isEqual(
             newValue.settings.selected,
-            this.componentController.cacheSelectedList
+            this.componentCtl.cacheSelectedList
           )
         ) {
           this.list.current = this.global.list[newValue.settings.selected];
         }
-        this.componentController.cacheSelectedList = newValue.settings.selected;
+        this.componentCtl.cacheSelectedList = newValue.settings.selected;
       },
       deep: true,
     },
