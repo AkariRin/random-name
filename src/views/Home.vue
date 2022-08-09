@@ -109,20 +109,25 @@ export default {
       settings: {
         //抽取模式,0为单抽,1为带滚动,2为批量
         mode: "0",
+        //批量抽取模式中的抽取数量
         batch_count: 0,
+        //选定的列表
         selected: "ListA",
+        //允许重复抽取
         allowRepeat: false,
         //自动去重
         unique: true,
+        //同步码
+        sync_code: "",
       },
-      list: {
+      namelists: {
         ListA: ["PersonA", "PersonB", "PersonC"],
         ListB: ["PersonF", "PersonD", "PersonE"],
       },
     },
     list: {
       //当前列表内容
-      current: Array,
+      current: [],
       //列表选择器
       selector: [],
     },
@@ -172,7 +177,7 @@ export default {
             this.componentCtl.cacheSelectedList
           )
         ) {
-          this.list.current = this.global.list[newValue.settings.selected];
+          this.list.current = this.global.namelists[newValue.settings.selected];
         }
         this.componentCtl.cacheSelectedList = newValue.settings.selected;
       },
@@ -185,8 +190,8 @@ export default {
       this.global = _.clone(JSON.parse(localStorage.getItem("data")));
     }
     //加载当前列表、列表选择器
-    this.list.current = this.global.list[this.global.settings.selected];
-    this.list.selector = _.keysIn(this.global.list);
+    this.list.current = this.global.namelists[this.global.settings.selected];
+    this.list.selector = _.keysIn(this.global.namelists);
   },
 };
 </script>
