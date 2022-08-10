@@ -31,7 +31,16 @@ export function loadNameList() {
 }
 
 //写入名单
-//export function writeNameList(val) {}
+export function writeNameList(val) {
+  let _local = JSON.parse(localStorage.getItem("data"));
+  _local.namelists = {}; //先清空名单列表
+  _.forIn(val, (value, key) => {
+    _local.namelists[key] = _.map(value, (_arr) => {
+      return _arr.name;
+    });
+  });
+  localStorage.setItem("data", JSON.stringify(_local));
+}
 
 //在组件挂载时检查Item是否存在，避免用户第一次直接打开/list路由导致没有默认数据生成的问题
 export function checkLSExists() {
