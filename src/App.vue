@@ -20,10 +20,28 @@
       </v-tooltip>
     </v-app-bar>
     <v-main>
+      <v-dialog v-model="darkmode_dialog" max-width="500px">
+        <v-card>
+          <v-card-title>外观</v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="6">
+                <v-radio-group v-model="$vuetify.theme.dark">
+                  <v-radio value="false" label="浅色模式"></v-radio>
+                  <v-radio value="true" label="深色模式"></v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <router-view />
     </v-main>
     <v-footer>
-      <v-col cols="12" class="text-center"><strong>random-name</strong> </v-col>
+      <v-col cols="12" class="text-center"><strong>random-name</strong></v-col>
     </v-footer>
   </v-app>
 </template>
@@ -31,6 +49,8 @@
 <script>
 export default {
   name: "App",
-  data: () => ({}),
+  data: () => ({
+    darkmode_dialog: true,
+  }),
 };
 </script>
