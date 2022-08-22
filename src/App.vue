@@ -32,9 +32,46 @@
 
 <script lang="ts">
 import Vue from "vue";
+import store from "@/store";
 
 export default Vue.extend({
   name: "App",
   data: () => ({}),
+  computed: {
+    dark: {
+      get: (): boolean => store.state.dark,
+      set: (newValue) =>
+        store.commit("updateSettingsBoolean", {
+          key: "dark",
+          value: newValue,
+        }),
+    },
+    darkWithOS: {
+      get: (): boolean => store.state.darkWithOS,
+      set: (newValue) => {
+        store.commit("updateSettingsBoolean", {
+          key: "darkWithOS",
+          value: newValue,
+        });
+        //待添加removeEventListener
+      },
+    },
+  },
+  created() {
+    //深色模式跟随系统
+    if (this.darkWithOS) {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      this.$vuetify.theme.dark = mq.matches;
+      store.commit("updateSettingsBoolean", { key: "dark", value: mq.matches });
+      mq.addEventListener("change", (e) => {
+        this.$vuetify.theme.dark = e.matches;
+      });
+    } else {
+      this.$vuetify.theme.dark = store.state.dark;
+    }
+  },
+  mounted() {
+    //
+  },
 });
 </script>
