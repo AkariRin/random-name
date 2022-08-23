@@ -83,6 +83,7 @@ export default Vue.extend({
     swRefresh(): void {
       this.snackbarUpdated = false;
       document.dispatchEvent(new CustomEvent("swSkipWaiting"));
+      console.log("refreshed");
     },
   },
   created(): void {
