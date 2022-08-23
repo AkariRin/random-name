@@ -21,6 +21,24 @@
     </v-app-bar>
 
     <v-main>
+      <v-snackbar
+        v-model="snackbarUpdFound"
+        transition="slide-y-reverse-transition"
+      >
+        发现更新，下载中
+      </v-snackbar>
+      <v-snackbar
+        v-model="snackbarUpdated"
+        transition="slide-y-reverse-transition"
+        timeout="-1"
+      >
+        更新已完成，请刷新页面以使用新版本
+        <template v-slot:action="{ attrs }">
+          <v-btn color="pink" text v-bind="attrs" @click="swRefresh">
+            刷新
+          </v-btn>
+        </template>
+      </v-snackbar>
       <router-view />
     </v-main>
 
@@ -36,7 +54,11 @@ import store from "@/store";
 
 export default Vue.extend({
   name: "App",
-  data: () => ({}),
+  data: () => ({
+    snackbarUpdFound: false,
+    snackbarUpdated: false,
+    reg: CustomEvent,
+  }),
   computed: {
     dark: {
       get: (): boolean => store.state.dark,
@@ -57,7 +79,35 @@ export default Vue.extend({
       },
     },
   },
-  created() {
+  methods: {
+    swRefresh(): void {
+      this.snackbarUpdated = false;
+      //this.reg.waiting.postMessage({ type: "SKIP_WAITING" });
+    },
+  },
+  created(): void {
+    //service worker提示
+    document.addEventListener(
+      "swUpdateFound",
+      (): void => {
+        this.snackbarUpdFound = true;
+      },
+      {
+        once: true,
+      }
+    );
+    document.addEventListener(
+      "swUpdated",
+      (event): void => {
+        let _e = event as CustomEvent;
+        this.snackbarUpdated = true;
+        this.reg = _e.detail;
+        console.log(this.reg);
+      },
+      {
+        once: true,
+      }
+    );
     //深色模式跟随系统
     if (this.darkWithOS) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -69,9 +119,6 @@ export default Vue.extend({
     } else {
       this.$vuetify.theme.dark = store.state.dark;
     }
-  },
-  mounted() {
-    //
   },
 });
 </script>
