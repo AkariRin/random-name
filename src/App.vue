@@ -103,6 +103,7 @@ export default Vue.extend({
         this.snackbarUpdated = true;
         this.reg = _e.detail;
         console.log(this.reg);
+        console.log(event);
       },
       {
         once: true,
