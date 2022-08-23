@@ -3,7 +3,9 @@
     <v-app-bar app color="primary" dark>
       <v-app-bar-title>随机点名器</v-app-bar-title>
       <v-spacer></v-spacer>
-      <v-btn icon dark><v-icon>mdi-weather-night</v-icon></v-btn>
+      <v-btn icon dark @click="dialogDark = true">
+        <v-icon>mdi-weather-night</v-icon>
+      </v-btn>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
