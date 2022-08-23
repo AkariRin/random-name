@@ -125,18 +125,12 @@ export default Vue.extend({
       window.location.reload();
     });
     //深色模式跟随系统
-    if (this.darkWithOS) {
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      this.$vuetify.theme.dark = mq.matches;
-      store.commit("updateSettingsBoolean", { key: "dark", value: mq.matches });
-      mq.addEventListener("change", (e) => {
-        if (this.darkWithOS) {
-          this.$vuetify.theme.dark = e.matches;
-        }
-      });
-    } else {
-      this.$vuetify.theme.dark = store.state.dark;
-    }
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", (e) => {
+      if (this.darkWithOS) {
+        this.$vuetify.theme.dark = e.matches;
+      }
+    });
   },
 });
 </script>
