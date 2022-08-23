@@ -30,7 +30,7 @@
       <v-snackbar
         v-model="snackbarUpdated"
         transition="slide-y-reverse-transition"
-        timeout="-1"
+        timeout="99999"
       >
         更新已完成，请刷新页面以使用新版本
         <template v-slot:action="{ attrs }">
