@@ -22,20 +22,7 @@ if (process.env.NODE_ENV === "production") {
     },
     updated(reg) {
       console.log("New content is available; please refresh.");
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        window.location.reload();
-      });
-      document.dispatchEvent(new CustomEvent("swUpdated"));
-      document.addEventListener(
-        "swSkipWaiting",
-        () => {
-          console.log("req arrived");
-          reg.waiting?.postMessage({ type: "SKIP_WAITING" });
-        },
-        {
-          once: true,
-        }
-      );
+      document.dispatchEvent(new CustomEvent("swUpdated", { detail: reg }));
     },
     offline() {
       console.log(

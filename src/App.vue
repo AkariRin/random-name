@@ -61,6 +61,7 @@ export default Vue.extend({
   data: () => ({
     snackbarUpdFound: false,
     snackbarUpdated: false,
+    refreshing: false,
     dialogDark: false,
   }),
   computed: {
@@ -86,7 +87,6 @@ export default Vue.extend({
     swRefresh(): void {
       this.snackbarUpdated = false;
       document.dispatchEvent(new CustomEvent("swSkipWaiting"));
-      console.log("refresh posted");
     },
   },
   created(): void {
@@ -102,13 +102,24 @@ export default Vue.extend({
     );
     document.addEventListener(
       "swUpdated",
-      (): void => {
+      (event): void => {
         this.snackbarUpdated = true;
+        let e = event as CustomEvent;
+        let reg = e.detail;
+        document.addEventListener("swSkipWaiting", () => {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+          console.log("skipped");
+        });
       },
       {
         once: true,
       }
     );
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (this.refreshing) return;
+      this.refreshing = true;
+      window.location.reload();
+    });
     //深色模式跟随系统
     if (this.darkWithOS) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
