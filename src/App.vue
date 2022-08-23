@@ -108,10 +108,15 @@ export default Vue.extend({
         this.snackbarUpdated = true;
         let e = event as CustomEvent;
         let reg = e.detail;
-        document.addEventListener("swSkipWaiting", () => {
-          reg.waiting.postMessage({ type: "SKIP_WAITING" });
-          console.log("skipped");
-        });
+        document.addEventListener(
+          "swSkipWaiting",
+          () => {
+            if (!reg || !reg.waiting) return;
+            reg.waiting.postMessage({ type: "SKIP_WAITING" });
+            console.log("skipped");
+          },
+          { once: true }
+        );
       },
       {
         once: true,
