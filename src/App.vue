@@ -40,7 +40,9 @@
           </v-btn>
         </template>
       </v-snackbar>
-      <v-dialog v-model="dialogDark"></v-dialog>
+      <v-dialog v-model="dialogDark">
+        <v-card></v-card>
+      </v-dialog>
       <router-view />
     </v-main>
 
