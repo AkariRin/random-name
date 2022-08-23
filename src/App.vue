@@ -75,7 +75,6 @@ export default Vue.extend({
           key: "darkWithOS",
           value: newValue,
         });
-        //待添加removeEventListener
       },
     },
   },
@@ -112,7 +111,9 @@ export default Vue.extend({
       this.$vuetify.theme.dark = mq.matches;
       store.commit("updateSettingsBoolean", { key: "dark", value: mq.matches });
       mq.addEventListener("change", (e) => {
-        this.$vuetify.theme.dark = e.matches;
+        if (this.darkWithOS) {
+          this.$vuetify.theme.dark = e.matches;
+        }
       });
     } else {
       this.$vuetify.theme.dark = store.state.dark;
