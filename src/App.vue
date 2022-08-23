@@ -63,7 +63,6 @@ export default Vue.extend({
   data: () => ({
     snackbarUpdFound: false,
     snackbarUpdated: false,
-    refreshing: false,
     dialogDark: false,
   }),
   computed: {
@@ -123,8 +122,6 @@ export default Vue.extend({
       }
     );
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (this.refreshing) return;
-      this.refreshing = true;
       window.location.reload();
     });
     //深色模式跟随系统
