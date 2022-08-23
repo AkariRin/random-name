@@ -29,6 +29,7 @@ if (process.env.NODE_ENV === "production") {
       document.addEventListener(
         "swSkipWaiting",
         () => {
+          console.log("req arrived");
           reg.waiting?.postMessage({ type: "SKIP_WAITING" });
         },
         {
