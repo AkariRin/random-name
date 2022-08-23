@@ -25,7 +25,10 @@ if (process.env.NODE_ENV === "production") {
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         window.location.reload();
       });
-      document.dispatchEvent(new CustomEvent("swUpdated", { detail: reg }));
+      document.dispatchEvent(new CustomEvent("swUpdated"));
+      document.addEventListener("swSkipWaiting", () => {
+        reg.waiting?.postMessage({ type: "SKIP_WAITING" });
+      });
     },
     offline() {
       console.log(

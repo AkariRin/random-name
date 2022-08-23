@@ -82,7 +82,7 @@ export default Vue.extend({
   methods: {
     swRefresh(): void {
       this.snackbarUpdated = false;
-      //this.reg.waiting.postMessage({ type: "SKIP_WAITING" });
+      document.dispatchEvent(new CustomEvent("swSkipWaiting"));
     },
   },
   created(): void {
@@ -98,12 +98,8 @@ export default Vue.extend({
     );
     document.addEventListener(
       "swUpdated",
-      (event): void => {
-        let _e = event as CustomEvent;
+      (): void => {
         this.snackbarUpdated = true;
-        this.reg = _e.detail;
-        console.log(this.reg);
-        console.log(event);
       },
       {
         once: true,
