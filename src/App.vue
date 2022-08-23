@@ -58,7 +58,7 @@ export default Vue.extend({
   data: () => ({
     snackbarUpdFound: false,
     snackbarUpdated: false,
-    reg: CustomEvent,
+    dialogDark: false,
   }),
   computed: {
     dark: {
