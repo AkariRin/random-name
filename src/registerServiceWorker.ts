@@ -20,15 +20,18 @@ if (process.env.NODE_ENV === "production") {
       console.log("New content is downloading.");
       document.dispatchEvent(new CustomEvent("swUpdateFound"));
     },
-    updated(reg) {
+    updated() {
       console.log("New content is available; please refresh.");
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        window.location.reload();
-      });
       document.dispatchEvent(new CustomEvent("swUpdated"));
-      document.addEventListener("swSkipWaiting", () => {
-        reg.waiting?.postMessage({ type: "SKIP_WAITING" });
-      });
+      document.addEventListener(
+        "swSkipWaiting",
+        () => {
+          //reg.waiting?.postMessage({ type: "SKIP_WAITING" });
+        },
+        {
+          once: true,
+        }
+      );
     },
     offline() {
       console.log(
