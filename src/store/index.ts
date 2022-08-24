@@ -12,8 +12,7 @@ type settings = {
   allowRepeat: boolean;
   unique: boolean;
   sync_code: string;
-  dark: boolean;
-  darkWithOS: boolean;
+  themePreference: "light" | "dark" | "followOS";
 };
 
 type states = settings & {
@@ -41,10 +40,8 @@ export default new Vuex.Store({
     unique: true,
     //同步码
     sync_code: "",
-    //深色模式
-    dark: false,
-    //深色模式跟随系统
-    darkWithOS: false,
+    //主题偏好
+    themePreference: "light",
     namelists: {
       ListA: ["PersonA", "PersonB", "PersonC"],
       ListB: ["PersonF", "PersonD", "PersonE"],
@@ -75,7 +72,7 @@ export default new Vuex.Store({
     updateSettingsBoolean(
       state,
       payload: {
-        key: "allowRepeat" | "unique" | "dark" | "darkWithOS";
+        key: "allowRepeat" | "unique";
         value: boolean;
       }
     ) {
@@ -92,6 +89,9 @@ export default new Vuex.Store({
     },
     updateSettingsMode(state, payload: "0" | "1" | "2") {
       state.mode = payload;
+    },
+    updateSettingsTheme(state, payload: "light" | "dark" | "followOS") {
+      state.themePreference = payload;
     },
   },
   actions: {},

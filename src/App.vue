@@ -42,8 +42,21 @@
           </v-btn>
         </template>
       </v-snackbar>
-      <v-dialog v-model="dialogDark">
-        <v-card></v-card>
+      <v-dialog v-model="dialogDark" max-width="300">
+        <v-card>
+          <v-card-title>主题偏好</v-card-title>
+          <v-card-text>
+            <v-radio-group v-model="themePreference" column mandatory>
+              <v-radio label="浅色模式" value="light"></v-radio>
+              <v-radio label="深色模式" value="dark"></v-radio>
+              <v-radio label="跟随系统设置" value="followOS"></v-radio>
+            </v-radio-group>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="red" @click="dialogDark = false" dark>关闭</v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
       <router-view />
     </v-main>
@@ -66,21 +79,18 @@ export default Vue.extend({
     dialogDark: false,
   }),
   computed: {
-    dark: {
-      get: (): boolean => store.state.dark,
-      set: (newValue) =>
-        store.commit("updateSettingsBoolean", {
-          key: "dark",
-          value: newValue,
-        }),
-    },
-    darkWithOS: {
-      get: (): boolean => store.state.darkWithOS,
-      set: (newValue) => {
-        store.commit("updateSettingsBoolean", {
-          key: "darkWithOS",
-          value: newValue,
-        });
+    themePreference: {
+      get: (): "light" | "dark" | "followOS" => store.state.themePreference,
+      set: function (newValue: "light" | "dark" | "followOS"): void {
+        store.commit("updateSettingsTheme", newValue);
+        //当主题偏好不跟随系统时，同步到$vuetify
+        newValue === "followOS"
+          ? (this.$vuetify.theme.dark = window.matchMedia(
+              "(prefers-color-scheme: dark)"
+            ).matches)
+          : newValue === "light"
+          ? (this.$vuetify.theme.dark = false)
+          : (this.$vuetify.theme.dark = true);
       },
     },
   },
@@ -126,8 +136,11 @@ export default Vue.extend({
     });
     //深色模式跟随系统
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (this.themePreference === "followOS") {
+      this.$vuetify.theme.dark = mq.matches;
+    }
     mq.addEventListener("change", (e) => {
-      if (this.darkWithOS) {
+      if (this.themePreference === "followOS") {
         this.$vuetify.theme.dark = e.matches;
       }
     });
