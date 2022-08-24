@@ -5,7 +5,7 @@
     </template>
     <v-card tile>
       <v-card-title>当前名单</v-card-title>
-      <v-card-subtitle>人数：{{ count }}</v-card-subtitle>
+      <v-card-subtitle>人数：{{ count }}人</v-card-subtitle>
       <v-card-text>
         <v-chip v-for="chip in chips" :key="chip" class="ma-1">{{
           chip
@@ -14,7 +14,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="dialog = false" color="red" dark>
+        <v-btn @click="dialog = false" color="primary" dark>
           <v-icon>mdi-close</v-icon>关闭
         </v-btn>
       </v-card-actions>
@@ -30,22 +30,14 @@ export default Vue.extend({
   name: "currentList",
   props: ["list"],
   data: () => ({
-    chips: [] as string[],
     dialog: false,
   }),
   computed: {
-    count: function () {
+    count: function (): number {
       return _.size(this.list);
     },
-  },
-  beforeMount() {
-    this.chips = this.list;
-  },
-  watch: {
-    list: {
-      handler(newValue: string[]) {
-        this.chips = newValue;
-      },
+    chips: function (): Array<string> {
+      return this.list;
     },
   },
 });

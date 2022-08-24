@@ -60,7 +60,9 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="red" @click="dialogDark = false" dark>关闭</v-btn>
+            <v-btn color="primary" @click="dialogDark = false" dark>
+              <v-icon>mdi-close</v-icon>关闭
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -152,9 +154,11 @@ export default Vue.extend({
     });
     //主题偏好设置
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    if (this.themePreference === "followOS") {
-      this.$vuetify.theme.dark = mq.matches;
-    }
+    this.themePreference === "followOS"
+      ? (this.$vuetify.theme.dark = mq.matches)
+      : this.themePreference === "dark"
+      ? (this.$vuetify.theme.dark = true)
+      : (this.$vuetify.theme.dark = false);
     mq.addEventListener("change", (e) => {
       if (this.themePreference === "followOS") {
         this.$vuetify.theme.dark = e.matches;

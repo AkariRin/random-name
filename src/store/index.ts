@@ -1,8 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import _ from "lodash";
+import VuexPersistence from "vuex-persist";
 
 Vue.use(Vuex);
+const vuexLocal = new VuexPersistence({
+  key: "vuex",
+  storage: window.localStorage,
+});
 
 //vuex数据的类型
 type settings = {
@@ -26,7 +31,7 @@ type listNamelist = {
   [key: string]: { name: string }[];
 };
 
-export default new Vuex.Store({
+export default new Vuex.Store<states>({
   state: {
     //抽取模式,0为单抽,1为带滚动,2为批量
     mode: "0",
@@ -94,6 +99,5 @@ export default new Vuex.Store({
       state.themePreference = payload;
     },
   },
-  actions: {},
-  modules: {},
+  plugins: [vuexLocal.plugin],
 });
