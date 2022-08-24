@@ -12,7 +12,7 @@ const vuexLocal = new VuexPersistence({
 //vuex数据的类型
 type settings = {
   mode: "0" | "1" | "2";
-  batch_count: number;
+  batchCount: number;
   selected: string;
   allowRepeat: boolean;
   unique: boolean;
@@ -36,7 +36,7 @@ export default new Vuex.Store<states>({
     //抽取模式,0为单抽,1为带滚动,2为批量
     mode: "0",
     //批量抽取模式中的抽取数量
-    batch_count: 0,
+    batchCount: 0,
     //选定的列表
     selected: "ListA",
     //允许重复抽取
@@ -53,7 +53,6 @@ export default new Vuex.Store<states>({
     },
   },
   getters: {
-    homeGetNamelistById: (state: states) => (id: string) => state.namelists[id],
     listGetNamelist: (state: states) => {
       const _result: listNamelist = {};
       _.forIn(state.namelists, (value, key) => {
@@ -86,7 +85,7 @@ export default new Vuex.Store<states>({
     updateSettingsNumber(
       state,
       payload: {
-        key: "batch_count";
+        key: "batchCount";
         value: number;
       }
     ) {

@@ -1,14 +1,14 @@
 <template>
   <div>
-    {{ list }}{{ result }} {{ isBatch }} {{ isRunning }}
+    {{ list }}{{ result }} {{ mode }} {{ isRunning }}
     <div
       class="text-h1 text-center"
-      v-if="!isBatch && !isRunning"
+      v-if="mode !== '2' && !isRunning"
       v-text="result"
     ></div>
     <div
       class="text-h1 text-center"
-      v-if="!isBatch && isRunning"
+      v-if="mode !== '2' && isRunning"
       v-text="text"
     ></div>
   </div>
@@ -19,7 +19,7 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "resultDisplay",
-  props: ["list", "result", "isBatch", "isRunning"],
+  props: ["list", "result", "mode", "isRunning"],
   data: () => ({
     text: "",
   }),
