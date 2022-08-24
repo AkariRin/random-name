@@ -15,7 +15,6 @@ if (process.env.NODE_ENV === "production") {
     },
     cached() {
       console.log("Content has been cached for offline use.");
-      //snackbar不显示，待解决
       document.dispatchEvent(new CustomEvent("swCached"));
     },
     updatefound() {

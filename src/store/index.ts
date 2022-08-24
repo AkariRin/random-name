@@ -21,13 +21,13 @@ type settings = {
 };
 
 type states = settings & {
-  namelists: {
+  nameLists: {
     [key: string]: Array<string>;
   };
 };
 
 //返回给ListView的数据的类型
-type listNamelist = {
+export type listNameList = {
   [key: string]: { name: string }[];
 };
 
@@ -47,15 +47,15 @@ export default new Vuex.Store<states>({
     sync_code: "",
     //主题偏好
     themePreference: "light",
-    namelists: {
+    nameLists: {
       ListA: ["PersonA", "PersonB", "PersonC"],
       ListB: ["PersonF", "PersonD", "PersonE"],
     },
   },
   getters: {
     listGetNamelist: (state: states) => {
-      const _result: listNamelist = {};
-      _.forIn(state.namelists, (value, key) => {
+      const _result: listNameList = {};
+      _.forIn(state.nameLists, (value, key) => {
         _result[key] = _.map(value, (_arr) => {
           return { name: _arr };
         });
@@ -96,6 +96,11 @@ export default new Vuex.Store<states>({
     },
     updateSettingsTheme(state, payload: "light" | "dark" | "followOS") {
       state.themePreference = payload;
+    },
+    updateListViewNamelists(state, payload: listNameList) {
+      _.forIn(payload, (value, key) => {
+        state.nameLists[key] = _.map(value, (_arr) => _arr.name);
+      });
     },
   },
   plugins: [vuexLocal.plugin],

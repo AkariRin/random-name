@@ -20,7 +20,7 @@
     </v-row>
     <v-row>
       <v-col cols="12" offset-md="1">
-        <v-radio-group v-model="mode" row mandatory>
+        <v-radio-group v-model="mode" @change="endRunning" row mandatory>
           <v-radio label="单抽" value="0"></v-radio>
           <v-radio label="滚动" value="1"></v-radio>
           <v-radio label="批量" value="2"></v-radio>
@@ -88,23 +88,25 @@ export default Vue.extend({
   components: { currentList, resultDisplay, infoPanel },
   data: () => ({
     result: "?" as string | Array<string> | undefined,
-    currentList: store.state.namelists[store.state.selected],
+    currentList: store.state.nameLists[store.state.selected],
     isRunning: false,
   }),
   methods: {
     startRunning(): void {
       this.isRunning = true;
     },
+    endRunning(): void {
+      this.isRunning = false;
+    },
     random(): void {
       this.result = _.sample(this.currentList);
       if (!this.allowRepeat) {
         _.pull(this.currentList, this.result);
       }
-      this.isRunning = false;
+      this.endRunning();
     },
     randomBatch(): void {
       this.result = _.sampleSize(this.currentList, this.batchCount);
-      this.isRunning = false;
       if (!this.allowRepeat) {
         _.pullAll(this.currentList, this.result);
       }
@@ -112,9 +114,7 @@ export default Vue.extend({
   },
   computed: {
     //列表选择器
-    list_selector: function (): Array<string> {
-      return _.keysIn(store.state.namelists);
-    },
+    list_selector: (): Array<string> => _.keysIn(store.state.nameLists),
     //选中的名单
     selected: {
       get: (): string => store.state.selected,
@@ -123,7 +123,7 @@ export default Vue.extend({
           key: "selected",
           value: newValue,
         });
-        this.currentList = store.state.namelists[store.state.selected];
+        this.currentList = store.state.nameLists[store.state.selected];
       },
     },
     //抽取模式
