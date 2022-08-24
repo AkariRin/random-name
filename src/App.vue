@@ -25,6 +25,12 @@
 
     <v-main>
       <v-snackbar
+        v-model="snackbarCached"
+        transition="slide-y-reverse-transition"
+      >
+        缓存完毕，可以离线使用了
+      </v-snackbar>
+      <v-snackbar
         v-model="snackbarUpdFound"
         transition="slide-y-reverse-transition"
       >
@@ -76,6 +82,7 @@ export default Vue.extend({
   data: () => ({
     snackbarUpdFound: false,
     snackbarUpdated: false,
+    snackbarCached: false,
     dialogDark: false,
   }),
   computed: {
@@ -102,6 +109,15 @@ export default Vue.extend({
   },
   created(): void {
     //service worker提示
+    document.addEventListener(
+      "swCached",
+      (): void => {
+        this.snackbarCached = true;
+      },
+      {
+        once: true,
+      }
+    );
     document.addEventListener(
       "swUpdateFound",
       (): void => {
@@ -134,7 +150,7 @@ export default Vue.extend({
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       window.location.reload();
     });
-    //深色模式跟随系统
+    //主题偏好设置
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     if (this.themePreference === "followOS") {
       this.$vuetify.theme.dark = mq.matches;

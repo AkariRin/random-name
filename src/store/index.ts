@@ -21,7 +21,7 @@ type states = settings & {
   };
 };
 
-//返回给ListView的数据的接口
+//返回给ListView的数据的类型
 type listNamelist = {
   [key: string]: { name: string }[];
 };
