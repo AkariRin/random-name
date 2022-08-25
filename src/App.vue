@@ -3,9 +3,15 @@
     <v-app-bar app color="primary" dark>
       <v-app-bar-title>随机点名器</v-app-bar-title>
       <v-spacer></v-spacer>
-      <v-btn icon dark @click="dialogDark = true">
-        <v-icon>mdi-weather-night</v-icon>
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon dark @click="dialogDark = true" v-bind="attrs" v-on="on">
+            <v-icon>mdi-weather-night</v-icon>
+          </v-btn>
+        </template>
+        <span>主题偏好</span>
+      </v-tooltip>
+      <advanced-settings></advanced-settings>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -19,7 +25,7 @@
             <v-icon>mdi-github</v-icon>
           </v-btn>
         </template>
-        <span>在GitHub查看源代码</span>
+        <span>GitHub</span>
       </v-tooltip>
     </v-app-bar>
 
@@ -78,9 +84,11 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
+import advancedSettings from "@/components/advancedSettings.vue";
 
 export default Vue.extend({
   name: "App",
+  components: { advancedSettings },
   data: () => ({
     snackbarUpdFound: false,
     snackbarUpdated: false,
