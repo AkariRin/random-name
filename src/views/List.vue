@@ -96,16 +96,6 @@ export default Vue.extend({
     },
   },
   computed: {
-    /*
-    namelists: {
-      get: (): listNameList => store.getters.listGetNamelist,
-      set: function (newValue): void {
-        this.$nextTick(() => {
-          store.commit("updateListViewNamelists", newValue);
-        });
-      },
-    },
-    */
     //去重
     unique: {
       get: (): boolean => store.state.unique,
