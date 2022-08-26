@@ -25,9 +25,21 @@
             <v-tab-item value="tab-1"></v-tab-item>
             <v-tab-item value="tab-2">
               <v-container>
-                <v-row></v-row>
+                <v-row>
+                  <v-textarea
+                    label="导出数据"
+                    :value="encodedDataExport"
+                    :hint="copiedText"
+                    persistent-hint
+                    filled
+                    readonly
+                  ></v-textarea>
+                </v-row>
                 <v-row>
                   <v-spacer></v-spacer>
+                  <v-btn @click="copy" color="blue" dark>
+                    <v-icon left>mdi-clipboard-text</v-icon>复制到剪贴板
+                  </v-btn>
                 </v-row>
               </v-container>
             </v-tab-item>
@@ -50,7 +62,18 @@ export default Vue.extend({
     dialog: false,
     tab: null,
     tabs: ["缓存设置", "导入数据", "导出数据", "关于"],
+    copiedText: "",
   }),
+  methods: {
+    async copy(): Promise<void> {
+      this.copiedText = "";
+      await navigator.clipboard.writeText(this.encodedDataExport);
+      this.copiedText = "已复制到剪贴板";
+      await setTimeout(() => {
+        this.copiedText = "";
+      }, 3000);
+    },
+  },
   computed: {
     //导出base64加密过的数据
     encodedDataExport: (): string => Base64.encode(JSON.stringify(store.state)),
