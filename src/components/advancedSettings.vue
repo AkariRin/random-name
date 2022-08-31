@@ -22,7 +22,25 @@
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item value="tab-0"></v-tab-item>
-            <v-tab-item value="tab-1"></v-tab-item>
+            <v-tab-item value="tab-1">
+              <v-container>
+                <v-form v-model="importValid">
+                  <v-row>
+                    <v-textarea
+                      v-model="importContent"
+                      label="导入数据"
+                      :rules="rules"
+                      filled
+                      clearable
+                    ></v-textarea>
+                  </v-row>
+                  <v-row>
+                    <v-spacer></v-spacer>
+                    <v-btn :disabled="!importValid">a</v-btn>
+                  </v-row>
+                </v-form>
+              </v-container>
+            </v-tab-item>
             <v-tab-item value="tab-2">
               <v-container>
                 <v-row>
@@ -63,6 +81,13 @@ export default Vue.extend({
     tab: null,
     tabs: ["缓存设置", "导入数据", "导出数据", "关于"],
     copiedText: "",
+    importContent: "",
+    importValid: false,
+    rules: [
+      (value: string) => !!value || "不能为空",
+      (value: string) => Base64.isValid(value) || "无法使用Base64解码",
+      (value: string) => Base64.isValid(value) || "无法解析JSON格式", //未完成
+    ],
   }),
   methods: {
     async copy(): Promise<void> {
