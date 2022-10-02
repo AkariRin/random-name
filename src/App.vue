@@ -122,6 +122,7 @@ export default Vue.extend({
     document.addEventListener(
       "swCached",
       (): void => {
+        this.snackbarUpdFound = false; //先关闭发现更新的snackbar再弹出新snackbar
         this.snackbarCached = true;
       },
       {
@@ -140,6 +141,7 @@ export default Vue.extend({
     document.addEventListener(
       "swUpdated",
       (event): void => {
+        this.snackbarUpdFound = false; //先关闭发现更新的snackbar再弹出新snackbar
         this.snackbarUpdated = true;
         let e = event as CustomEvent;
         let reg = e.detail;
