@@ -1,2 +1,2 @@
 # random-name
-[random-name.rbq.ac](https://random-name.rbq.ac)
+[random-name.rbq.dev](https://random-name.rbq.dev)
