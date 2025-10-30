@@ -13,7 +13,6 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import _ from 'lodash'
 
 const props = defineProps({
   list: Array,

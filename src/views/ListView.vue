@@ -90,7 +90,6 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import _ from 'lodash'
 import { useAppStore } from '../stores/appStore'
 
 const appStore = useAppStore()
