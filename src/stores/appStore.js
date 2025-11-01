@@ -9,10 +9,7 @@ export const useAppStore = defineStore('app', () => {
   const unique = ref(true)
   const syncCode = ref('')
   const themePreference = ref('light') // 'light', 'dark', 'followOS'
-  const nameLists = ref({
-    ListA: ['PersonA', 'PersonB', 'PersonC'],
-    ListB: ['PersonF', 'PersonD', 'PersonE'],
-  })
+  const nameLists = ref({})
 
   const listGetNamelist = computed(() => {
     const result = {}

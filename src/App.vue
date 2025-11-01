@@ -234,47 +234,47 @@
             <v-card-title>管理名单</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <v-btn @click="addNewList" color="success" class="mb-4">
-                <v-icon start>mdi-plus</v-icon>新增名单
-              </v-btn>
+              <div class="mb-4">
+                <v-btn @click="createListDialog = true" color="success" class="mr-2">
+                  <v-icon start>mdi-plus</v-icon>创建名单
+                </v-btn>
+                <v-btn @click="deleteConfirm('allLists')" color="error">
+                  <v-icon start>mdi-delete</v-icon>删除所有名单
+                </v-btn>
+              </div>
               <v-expansion-panels>
                 <v-expansion-panel v-for="(values, listName) in namelists" :key="listName">
                   <template #title>
                     <span>{{ listName }}</span>
+                    <v-spacer></v-spacer>
+                    <span class="text-caption mr-4">人数: {{ values.length }}</span>
                   </template>
                   <template #text>
-                    <v-data-table
-                      :headers="headers"
-                      :items="values"
-                      sort-by="name"
-                      class="elevation-1"
-                      locale="zhHans"
-                    >
-                      <template #top>
-                        <v-toolbar flat>
-                          <v-toolbar-title>编辑名单：{{ listName }}</v-toolbar-title>
-                          <v-divider class="mx-4" inset vertical></v-divider>
-                          <v-spacer></v-spacer>
-                          <v-btn @click="batchAddNameOpen(listName)" color="purple" size="small">
-                            <v-icon start>mdi-plus</v-icon>添加姓名
-                          </v-btn>
-                          <v-btn @click="deleteConfirm('list', listName)" color="primary" size="small">
-                            <v-icon start>mdi-delete</v-icon>删除名单
-                          </v-btn>
-                        </v-toolbar>
-                      </template>
-                      <template #no-data>
-                        <div class="text-center pa-4">名单为空</div>
-                      </template>
-                      <template #[`item.actions`]="{ item, index }">
-                        <v-btn icon="mdi-pencil" size="x-small"></v-btn>
-                        <v-btn
-                          @click="deleteConfirm('name', listName, item, index)"
-                          icon="mdi-delete"
-                          size="x-small"
-                        ></v-btn>
-                      </template>
-                    </v-data-table>
+                    <div class="pa-4">
+                      <v-btn @click="batchAddNameOpen(listName)" color="purple" size="small" class="mb-4">
+                        <v-icon start>mdi-plus</v-icon>添加姓名
+                      </v-btn>
+                      <v-btn @click="deleteConfirm('list', listName)" color="error" size="small" class="mb-4 ml-2">
+                        <v-icon start>mdi-delete</v-icon>删除名单
+                      </v-btn>
+                      <v-divider class="my-4"></v-divider>
+                      <div v-if="values.length === 0" class="text-center text-grey">
+                        名单为空
+                      </div>
+                      <v-list v-else>
+                        <v-list-item v-for="(item, index) in values" :key="index">
+                          <v-list-item-title>{{ item.name }}</v-list-item-title>
+                          <template #append>
+                            <v-btn
+                              @click="deleteConfirm('name', listName, item, index)"
+                              icon="mdi-delete"
+                              size="x-small"
+                              color="error"
+                            ></v-btn>
+                          </template>
+                        </v-list-item>
+                      </v-list>
+                    </div>
                   </template>
                 </v-expansion-panel>
               </v-expansion-panels>
@@ -322,6 +322,30 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <v-dialog v-model="createListDialog" max-width="600px">
+          <v-card>
+            <v-card-title>创建名单</v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="newListName"
+                label="名单名称"
+                placeholder="请输入名单名称"
+                filled
+                clearable
+              ></v-text-field>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="createListDialog = false" color="primary">
+                <v-icon start>mdi-close</v-icon>取消
+              </v-btn>
+              <v-btn color="success" @click="createListExec" :disabled="!newListName.trim()">
+                <v-icon start>mdi-plus</v-icon>创建
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-container>
     </v-main>
   </v-app>
@@ -334,7 +358,6 @@ import { Base64 } from 'js-base64'
 
 const app = useAppStore()
 
-// App 相关
 const dialogDark = ref(false)
 const dialogSettings = ref(false)
 const tab = ref(0)
@@ -342,13 +365,6 @@ const tabs = ['导入数据', '导出数据', '关于']
 const copiedText = ref('')
 const importContent = ref('')
 const importValid = ref(false)
-
-const rules = [
-  (value) => !!value || '不能为空',
-  (value) => Base64.isValid(value) || '无法使用Base64解码',
-]
-
-// HomeView 相关
 const result = ref('?')
 const isRunning = ref(false)
 const currentListData = ref([...app.nameLists[app.selected]])
@@ -356,21 +372,23 @@ const displayText = ref('?')
 const textIndex = ref(0)
 const dialog = ref(false)
 const manageDialog = ref(false)
-
-// 管理名单相关
-const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
-const headers = [
-  { key: 'name', title: '姓名' },
-  { key: 'actions', title: '操作', sortable: false },
-]
-
 const deleteDialog = ref(false)
-const deleteType = ref('list') // 'name' | 'list'
+const deleteType = ref('list') // 'name' | 'list' | 'allLists'
 const batchAddNameDialog = ref(false)
 const batchAddNameContent = ref('')
 const useNewline = ref(true)
 const targetList = ref('')
 const targetIndex = ref(-1)
+const createListDialog = ref(false)
+const newListName = ref('')
+
+const rules = [
+  (value) => !!value || '不能为空',
+  (value) => Base64.isValid(value) || '无法使用Base64解码',
+]
+
+// 管理名单相关
+const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
 
 const themePreference = computed({
   get() {
@@ -468,7 +486,9 @@ const batchCount = computed({
 })
 
 const deleteDialogText = computed(() => {
-  if (deleteType.value === 'list') {
+  if (deleteType.value === 'allLists') {
+    return '你确定要删除所有名单吗？此操作不可撤销！'
+  } else if (deleteType.value === 'list') {
     return `你确定要删除名单 ${targetList.value} 吗？`
   } else {
     const item = namelists.value[targetList.value]?.[targetIndex.value]
@@ -608,22 +628,29 @@ const deleteConfirm = (type, listName, item, index) => {
   deleteDialog.value = true
 }
 
+const createListExec = () => {
+  if (!newListName.value.trim()) {
+    return
+  }
+
+  namelists.value[newListName.value] = []
+  newListName.value = ''
+  createListDialog.value = false
+}
+
 const deleteExec = (action) => {
   if (action === 'delete') {
     if (deleteType.value === 'name') {
       namelists.value[targetList.value].splice(targetIndex.value, 1)
     } else if (deleteType.value === 'list') {
       delete namelists.value[targetList.value]
+    } else if (deleteType.value === 'allLists') {
+      namelists.value = {}
     }
   }
 
   deleteType.value = 'list'
   targetIndex.value = -1
   deleteDialog.value = false
-}
-
-const addNewList = () => {
-  const listName = `List${Object.keys(namelists.value).length + 1}`
-  namelists.value[listName] = []
 }
 </script>
