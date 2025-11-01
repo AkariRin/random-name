@@ -77,7 +77,21 @@
 
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
-        <InfoPanel></InfoPanel>
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <template #title>
+              <span>说明</span>
+            </template>
+            <template #text>
+              <div>
+                <p><strong>单抽模式：</strong>每次随机抽取一个人</p>
+                <p><strong>滚动模式：</strong>快速滚动列表，点击停止按钮时显示结果</p>
+                <p><strong>批量模式：</strong>一次性随机抽取多个人</p>
+                <p><strong>允许重复：</strong>关闭时，被抽取的人会从列表中移除</p>
+              </div>
+            </template>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
     </v-row>
 
@@ -96,19 +110,17 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import _ from 'lodash'
 import { useAppStore } from '../stores/appStore'
 import CurrentList from '../components/CurrentList.vue'
-import InfoPanel from '../components/InfoPanel.vue'
 import ResultDisplay from '../components/ResultDisplay.vue'
 
-const appStore = useAppStore()
+const app = useAppStore()
 
 const result = ref('?')
 const isRunning = ref(false)
-const currentListData = ref([...appStore.nameLists[appStore.selected]])
+const currentListData = ref([...app.nameLists[app.selected]])
 
-const list_selector = computed(() => _.keys(appStore.nameLists))
+const list_selector = computed(() => Object.keys(app.nameLists))
 
 const currentList = computed({
   get() {
@@ -121,39 +133,39 @@ const currentList = computed({
 
 const selected = computed({
   get() {
-    return appStore.selected
+    return app.selected
   },
   set(newValue) {
-    appStore.setSelected(newValue)
-    currentListData.value = [...appStore.nameLists[newValue]]
+    app.setSelected(newValue)
+    currentListData.value = [...app.nameLists[newValue]]
     result.value = '?'
   },
 })
 
 const mode = computed({
   get() {
-    return appStore.mode
+    return app.mode
   },
   set(newValue) {
-    appStore.updateSettingsMode(newValue)
+    app.updateSettingsMode(newValue)
   },
 })
 
 const allowRepeat = computed({
   get() {
-    return appStore.allowRepeat
+    return app.allowRepeat
   },
   set(newValue) {
-    appStore.updateSettingsBoolean('allowRepeat', newValue)
+    app.updateSettingsBoolean('allowRepeat', newValue)
   },
 })
 
 const batchCount = computed({
   get() {
-    return appStore.batchCount
+    return app.batchCount
   },
   set(newValue) {
-    appStore.updateSettingsNumber('batchCount', newValue)
+    app.updateSettingsNumber('batchCount', newValue)
   },
 })
 
@@ -170,9 +182,12 @@ const randomSingle = () => {
     result.value = '名单为空'
     return
   }
-  result.value = _.sample(currentList.value)
+  // 随机抽取一个元素
+  const randomIndex = Math.floor(Math.random() * currentList.value.length)
+  result.value = currentList.value[randomIndex]
   if (!allowRepeat.value) {
-    _.pull(currentList.value, result.value)
+    // 移除选中的元素
+    currentList.value.splice(randomIndex, 1)
   }
 }
 
@@ -182,9 +197,12 @@ const random = () => {
     isRunning.value = false
     return
   }
-  result.value = _.sample(currentList.value)
+  // 随机抽取一个元素
+  const randomIndex = Math.floor(Math.random() * currentList.value.length)
+  result.value = currentList.value[randomIndex]
   if (!allowRepeat.value) {
-    _.pull(currentList.value, result.value)
+    // 移除选中的元素
+    currentList.value.splice(randomIndex, 1)
   }
   endRunning()
 }
@@ -195,9 +213,19 @@ const randomBatch = () => {
     return
   }
   const count = Math.min(batchCount.value, currentList.value.length)
-  result.value = _.sampleSize(currentList.value, count)
+  // 使随机抽取 count 个元素
+  const arr = [...currentList.value]
+  const selected = []
+  for (let i = 0; i < count; i++) {
+    const randomIndex = Math.floor(Math.random() * (arr.length - i))
+    selected.push(arr[randomIndex])
+    // 将选中的元素与末尾元素交换
+    ;[arr[randomIndex], arr[arr.length - 1 - i]] = [arr[arr.length - 1 - i], arr[randomIndex]]
+  }
+  result.value = selected
   if (!allowRepeat.value) {
-    _.pullAll(currentList.value, result.value)
+    // 从原数组中移除选中的元素
+    currentList.value = currentList.value.filter(item => !selected.includes(item))
   }
 }
 </script>

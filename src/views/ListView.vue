@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <!-- Delete confirmation dialog -->
     <v-dialog v-model="deleteDialog" max-width="600px">
       <v-card>
         <v-card-title class="text-h5 text-center">
@@ -14,8 +13,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- Batch add names dialog -->
     <v-dialog v-model="batchAddNameDialog" max-width="600px">
       <v-card>
         <v-card-title>批量添加姓名</v-card-title>
@@ -35,8 +32,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- Name lists management -->
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
         <v-btn @click="addNewList" color="success" class="mb-4">
@@ -90,11 +85,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useAppStore } from '../stores/appStore'
+import { useApp } from '../stores/appStore'
 
-const appStore = useAppStore()
+const app = useApp()
 
-const namelists = ref(JSON.parse(JSON.stringify(appStore.listGetNamelist)))
+const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
 const headers = [
   { key: 'name', title: '姓名' },
   { key: 'actions', title: '操作', sortable: false },
@@ -167,7 +162,6 @@ const deleteExec = (action) => {
     }
   }
 
-  // Reset state
   deleteType.value = 'list'
   targetIndex.value = -1
   deleteDialog.value = false
@@ -178,15 +172,11 @@ const addNewList = () => {
   namelists.value[listName] = []
 }
 
-// Watch for changes and sync to store
 watch(
   () => namelists.value,
   (newValue) => {
-    appStore.updateListViewNamelists(newValue)
+    app.updateListViewNamelists(newValue)
   },
   { deep: true }
 )
 </script>
-
-<style scoped></style>
-

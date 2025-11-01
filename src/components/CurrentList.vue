@@ -24,7 +24,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import _ from 'lodash'
 
 const props = defineProps({
   list: Array,
@@ -32,7 +31,7 @@ const props = defineProps({
 
 const dialog = ref(false)
 
-const count = computed(() => _.size(props.list))
+const count = computed(() => props.list?.length || 0)
 const chips = computed(() => props.list || [])
 </script>
 

@@ -12,25 +12,18 @@ import '@fontsource/roboto'
 import App from './App.vue'
 import router from './router'
 
-const app = createApp(App)
-
-// Pinia with persistence
-const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
-
-// Vuetify configuration
-const vuetify = createVuetify({
-  components,
-  directives,
-  theme: {
-    defaultTheme: 'light',
-  },
-})
-
-app
-  .use(pinia)
+createApp(App)
+  .use(createPinia()
+    .use(piniaPluginPersistedstate)
+  )
   .use(router)
-  .use(vuetify)
+  .use(createVuetify({
+    components,
+    directives,
+    theme: {
+      defaultTheme: 'light',
+    },
+  }))
   .mount('#app')
 
 

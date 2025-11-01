@@ -31,7 +31,6 @@ const batchResults = computed(() => {
   return []
 })
 
-// Simulate rolling text animation
 watch(
   () => props.isRunning,
   (newValue) => {
@@ -54,6 +53,3 @@ watch(
   }
 )
 </script>
-
-<style scoped></style>
-
