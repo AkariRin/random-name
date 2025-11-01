@@ -49,9 +49,21 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const updateListViewNamelists = (payload) => {
-    Object.entries(payload).forEach(([key, value]) => {
-      nameLists.value[key] = value.map((item) => item.name)
-    })
+    // 如果 payload 为空对象，清空所有名单
+    if (Object.keys(payload).length === 0) {
+      nameLists.value = {}
+    } else {
+      // 先清空不存在于 payload 中的名单
+      Object.keys(nameLists.value).forEach((key) => {
+        if (!(key in payload)) {
+          delete nameLists.value[key]
+        }
+      })
+      // 更新或添加 payload 中的名单
+      Object.entries(payload).forEach(([key, value]) => {
+        nameLists.value[key] = value.map((item) => item.name)
+      })
+    }
   }
 
   const setSelected = (newSelected) => {

@@ -93,7 +93,45 @@
                   </v-row>
                 </v-container>
               </v-window-item>
-              <v-window-item :value="2"></v-window-item>
+              <v-window-item :value="2">
+                <v-container>
+                  <v-row class="ma-4">
+                    <v-col cols="12">
+                      <div class="text-h5 font-weight-bold mb-4">关于随机点名器</div>
+                      <div class="text-body1 mb-4">
+                        <p class="mb-3">
+                          <strong>随机点名器</strong>是一个简单易用的随机抽取工具，用于课堂、会议或任何需要随机选择的场景。
+                        </p>
+                        <p class="mb-3">
+                          <strong>主要功能：</strong>
+                        </p>
+                        <ul class="ml-4 mb-3">
+                          <li><strong>单抽模式</strong>：每次随机抽取一个人，快速便捷</li>
+                          <li><strong>滚动模式</strong>：快速滚动列表直到点击停止，增加趣味性</li>
+                          <li><strong>批量模式</strong>：一次性随机抽取多个人，适合分组</li>
+                          <li><strong>灵活配置</strong>：支持允许重复和不允许重复两种模式</li>
+                          <li><strong>名单管理</strong>：创建多个名单、导入导出、批量编辑</li>
+                          <li><strong>主题切换</strong>：支持浅色、深色和跟随系统设置</li>
+                          <li><strong>数据同步</strong>：支持导入导出编码数据，方便跨设备同步</li>
+                        </ul>
+                        <p class="mb-3">
+                          <strong>使用建议：</strong>
+                        </p>
+                        <ul class="ml-4 mb-3">
+                          <li>在课堂中随机点名学生回答问题</li>
+                          <li>在会议中随机选择发言人或小组</li>
+                          <li>在抽奖活动中随机选择获奖者</li>
+                          <li>在体育比赛中随机选择队伍或参赛者</li>
+                        </ul>
+                        <p class="text-caption">
+                          项目开源于
+                          <a href="https://github.com/AkariRin/random-name" target="_blank" class="text-blue">GitHub</a>
+                        </p>
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-window-item>
             </v-window>
           </v-card-text>
         </v-card>
@@ -252,7 +290,7 @@
                   @change="handleFileImport"
                 />
               </div>
-              <v-expansion-panels>
+              <v-expansion-panels :key="`panels-${refreshTrigger}-${Object.keys(namelists).length}`">
                 <v-expansion-panel v-for="(values, listName) in namelists" :key="listName">
                   <template #title>
                     <span>{{ listName }}</span>
@@ -386,7 +424,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useAppStore } from './stores/appStore'
 import { Base64 } from 'js-base64'
 
@@ -447,7 +485,7 @@ const rules = [
 
 // 数据
 const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
-const currentListData = ref([...app.nameLists[app.selected]])
+const currentListData = ref([...(app.nameLists[app.selected] || [])])
 const textIndex = ref(0)
 const isRunning = ref(false)
 
@@ -455,6 +493,7 @@ const isRunning = ref(false)
 const deleteType = ref('list') // 'name' | 'list' | 'allLists'
 const targetList = ref('')
 const targetIndex = ref(-1)
+const refreshTrigger = ref(0) // 用于强制 UI 更新
 
 // 文件输入引用
 const fileInput = ref(null)
@@ -475,7 +514,7 @@ const selected = computed({
   },
   set(newValue) {
     app.setSelected(newValue)
-    currentListData.value = [...app.nameLists[newValue]]
+    currentListData.value = [...(app.nameLists[newValue] || [])]
     result.value = '?'
   },
 })
@@ -556,11 +595,19 @@ watch(
 )
 
 watch(
-  () => namelists.value,
+  namelists,
   (newValue) => {
     app.updateListViewNamelists(newValue)
   },
   { deep: true }
+)
+
+// 监听 list_selector 的变化，当名单列表变化时刷新 UI
+watch(
+  list_selector,
+  () => {
+    // 这个 watch 仅用于确保 UI 能正确响应名单列表的变化
+  }
 )
 
 const startRunning = () => {
@@ -693,8 +740,27 @@ const deleteExec = (action) => {
       namelists.value[targetList.value].splice(targetIndex.value, 1)
     } else if (deleteType.value === 'list') {
       delete namelists.value[targetList.value]
+      // 如果删除的是当前选中的名单，重置选中项
+      if (selected.value === targetList.value) {
+        const availableLists = Object.keys(namelists.value)
+        const newSelected = availableLists[0] || ''
+        app.setSelected(newSelected)
+        currentListData.value = newSelected ? [...(app.nameLists[newSelected] || [])] : []
+      }
     } else if (deleteType.value === 'allLists') {
-      namelists.value = {}
+      // 创建全新的空对象，确保 Vue 能正确检测到引用变化
+      namelists.value = JSON.parse(JSON.stringify({}))
+      // 清空 store 中的名单
+      app.updateListViewNamelists({})
+      // 重置选中项
+      app.setSelected('')
+      currentListData.value = []
+      result.value = '?'
+      // 强制 UI 更新
+      refreshTrigger.value++
+      nextTick(() => {
+        // 确保 Vue 进行重新渲染
+      })
     }
   }
 
