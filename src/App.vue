@@ -105,10 +105,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useApp } from './stores/appStore'
+import { useAppStore } from './stores/appStore'
 import { Base64 } from 'js-base64'
 
-const app = useApp()
+const app = useAppStore()
 
 const dialogDark = ref(false)
 const dialogSettings = ref(false)

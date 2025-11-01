@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export const useApp = defineStore('app', () => {
+export const useAppStore = defineStore('app', () => {
   const mode = ref('0') // '0' - single, '1' - scroll, '2' - batch
   const batchCount = ref(0)
   const selected = ref('ListA')

@@ -85,9 +85,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useApp } from '../stores/appStore'
+import { useAppStore } from '../stores/appStore'
 
-const app = useApp()
+const app = useAppStore()
 
 const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
 const headers = [
