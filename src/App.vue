@@ -392,41 +392,74 @@ import { Base64 } from 'js-base64'
 
 const app = useAppStore()
 
+// 对话框状态
 const dialogDark = ref(false)
 const dialogSettings = ref(false)
-const tab = ref(0)
-const tabs = ['导入数据', '导出数据', '关于']
-const copiedText = ref('')
-const importContent = ref('')
-const importValid = ref(false)
-const result = ref('?')
-const isRunning = ref(false)
-const currentListData = ref([...app.nameLists[app.selected]])
-const displayText = ref('?')
-const textIndex = ref(0)
 const dialog = ref(false)
 const manageDialog = ref(false)
 const deleteDialog = ref(false)
-const deleteType = ref('list') // 'name' | 'list' | 'allLists'
 const batchAddNameDialog = ref(false)
-const batchAddNameContent = ref('')
-const useNewline = ref(true)
-const targetList = ref('')
-const targetIndex = ref(-1)
 const createListDialog = ref(false)
-const newListName = ref('')
-const fileInput = ref(null)
 const importListDialog = ref(false)
+
+// 标签页和表单输入
+const tab = ref(0)
+const tabs = ['导入数据', '导出数据', '关于']
+const importContent = ref('')
+const importValid = ref(false)
+const copiedText = ref('')
+const batchAddNameContent = ref('')
+const newListName = ref('')
 const importListName = ref('')
 
+// 单选框和开关
+const useNewline = ref(true)
+
+// 显示结果
+const result = ref('?')
+const displayText = ref('?')
+
+// UI 计算属性
+const deleteDialogText = computed(() => {
+  if (deleteType.value === 'allLists') {
+    return '你确定要删除所有名单吗？此操作不可撤销！'
+  } else if (deleteType.value === 'list') {
+    return `你确定要删除名单 ${targetList.value} 吗？`
+  } else {
+    const item = namelists.value[targetList.value]?.[targetIndex.value]
+    return `你确定要删除名单 ${targetList.value} 中的 ${item?.name} 吗？`
+  }
+})
+const batchResults = computed(() => {
+  if (mode.value === '2' && Array.isArray(result.value)) {
+    return result.value
+  }
+  return []
+})
+const count = computed(() => currentList.value?.length || 0)
+const chips = computed(() => currentList.value || [])
+
+// 常量和验证规则
 const rules = [
   (value) => !!value || '不能为空',
   (value) => Base64.isValid(value) || '无法使用Base64解码',
 ]
 
-// 管理名单相关
+// 数据
 const namelists = ref(JSON.parse(JSON.stringify(app.listGetNamelist)))
+const currentListData = ref([...app.nameLists[app.selected]])
+const textIndex = ref(0)
+const isRunning = ref(false)
 
+// 删除操作相关状态
+const deleteType = ref('list') // 'name' | 'list' | 'allLists'
+const targetList = ref('')
+const targetIndex = ref(-1)
+
+// 文件输入引用
+const fileInput = ref(null)
+
+// 应用设置计算属性
 const themePreference = computed({
   get() {
     return app.themePreference
@@ -435,54 +468,6 @@ const themePreference = computed({
     app.updateSettingsTheme(newValue)
   },
 })
-
-const encodedDataExport = computed(() => {
-  const data = {
-    nameLists: app.nameLists,
-    mode: app.mode,
-    batchCount: app.batchCount,
-    selected: app.selected,
-    allowRepeat: app.allowRepeat,
-    unique: app.unique,
-    syncCode: app.syncCode,
-    themePreference: app.themePreference,
-  }
-  return Base64.encode(JSON.stringify(data))
-})
-
-const copy = async () => {
-  copiedText.value = ''
-  try {
-    await navigator.clipboard.writeText(encodedDataExport.value)
-    copiedText.value = '已复制到剪贴板'
-    setTimeout(() => {
-      copiedText.value = ''
-    }, 3000)
-  } catch (err) {
-    console.error('复制失败:', err)
-  }
-}
-
-const list_selector = computed(() => Object.keys(app.nameLists))
-
-const currentList = computed({
-  get() {
-    return currentListData.value
-  },
-  set(newValue) {
-    currentListData.value = newValue
-  },
-})
-
-const batchResults = computed(() => {
-  if (mode.value === '2' && Array.isArray(result.value)) {
-    return result.value
-  }
-  return []
-})
-
-const count = computed(() => currentList.value?.length || 0)
-const chips = computed(() => currentList.value || [])
 
 const selected = computed({
   get() {
@@ -522,15 +507,30 @@ const batchCount = computed({
   },
 })
 
-const deleteDialogText = computed(() => {
-  if (deleteType.value === 'allLists') {
-    return '你确定要删除所有名单吗？此操作不可撤销！'
-  } else if (deleteType.value === 'list') {
-    return `你确定要删除名单 ${targetList.value} 吗？`
-  } else {
-    const item = namelists.value[targetList.value]?.[targetIndex.value]
-    return `你确定要删除名单 ${targetList.value} 中的 ${item?.name} 吗？`
+// 数据处理计算属性
+const currentList = computed({
+  get() {
+    return currentListData.value
+  },
+  set(newValue) {
+    currentListData.value = newValue
+  },
+})
+
+const list_selector = computed(() => Object.keys(app.nameLists))
+
+const encodedDataExport = computed(() => {
+  const data = {
+    nameLists: app.nameLists,
+    mode: app.mode,
+    batchCount: app.batchCount,
+    selected: app.selected,
+    allowRepeat: app.allowRepeat,
+    unique: app.unique,
+    syncCode: app.syncCode,
+    themePreference: app.themePreference,
   }
+  return Base64.encode(JSON.stringify(data))
 })
 
 watch(
@@ -569,6 +569,19 @@ const startRunning = () => {
 
 const endRunning = () => {
   isRunning.value = false
+}
+
+const copy = async () => {
+  copiedText.value = ''
+  try {
+    await navigator.clipboard.writeText(encodedDataExport.value)
+    copiedText.value = '已复制到剪贴板'
+    setTimeout(() => {
+      copiedText.value = ''
+    }, 3000)
+  } catch (err) {
+    console.error('复制失败:', err)
+  }
 }
 
 const randomSingle = () => {
@@ -623,7 +636,6 @@ const randomBatch = () => {
   }
 }
 
-// 管理名单相关方法
 const batchAddNameOpen = (listName) => {
   targetList.value = listName
   batchAddNameContent.value = ''
@@ -654,6 +666,16 @@ const batchAddNameExec = () => {
   batchAddNameContent.value = ''
 }
 
+const createListExec = () => {
+  if (!newListName.value.trim()) {
+    return
+  }
+
+  namelists.value[newListName.value] = []
+  newListName.value = ''
+  createListDialog.value = false
+}
+
 const deleteConfirm = (type, listName, item, index) => {
   deleteType.value = type
   targetList.value = listName
@@ -663,16 +685,6 @@ const deleteConfirm = (type, listName, item, index) => {
     targetIndex.value = -1
   }
   deleteDialog.value = true
-}
-
-const createListExec = () => {
-  if (!newListName.value.trim()) {
-    return
-  }
-
-  namelists.value[newListName.value] = []
-  newListName.value = ''
-  createListDialog.value = false
 }
 
 const deleteExec = (action) => {
