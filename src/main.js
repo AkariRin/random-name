@@ -10,13 +10,11 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@fontsource/roboto'
 
 import App from './App.vue'
-import router from './router'
 
 createApp(App)
   .use(createPinia()
     .use(piniaPluginPersistedstate)
   )
-  .use(router)
   .use(createVuetify({
     components,
     directives,
