@@ -9,7 +9,27 @@
         ></v-select>
       </v-col>
       <v-col cols="6" md="1">
-        <CurrentList :list="currentList"></CurrentList>
+        <v-dialog v-model="dialog" max-width="1000" scrollable>
+          <template #activator="{ props }">
+            <v-btn v-bind="props" block>查看当前名单</v-btn>
+          </template>
+          <v-card tile>
+            <v-card-title>当前名单</v-card-title>
+            <v-card-subtitle>人数：{{ count }}人</v-card-subtitle>
+            <v-card-text>
+              <v-chip v-for="chip in chips" :key="chip" class="ma-1">
+                {{ chip }}
+              </v-chip>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="dialog = false" color="primary">
+                <v-icon start>mdi-close</v-icon>关闭
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
       <v-col cols="6" md="1">
         <v-btn @click="$router.push('/list')" block>
@@ -97,28 +117,33 @@
 
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
-        <ResultDisplay
-          :result="result"
-          :list="currentList"
-          :mode="mode"
-          :is-running="isRunning"
-        ></ResultDisplay>
+        <div>
+          <div class="text-h1 text-center" v-if="mode !== '2' && !isRunning" v-text="result"></div>
+          <div class="text-h1 text-center" v-if="mode !== '2' && isRunning" v-text="displayText"></div>
+          <div v-if="mode === '2'">
+            <div class="text-h4 mb-4">批量抽取结果：</div>
+            <v-chip v-for="item in batchResults" :key="item" class="ma-2">
+              {{ item }}
+            </v-chip>
+          </div>
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAppStore } from '../stores/appStore'
-import CurrentList from '../components/CurrentList.vue'
-import ResultDisplay from '../components/ResultDisplay.vue'
 
 const app = useAppStore()
 
 const result = ref('?')
 const isRunning = ref(false)
 const currentListData = ref([...app.nameLists[app.selected]])
+const displayText = ref('?')
+const textIndex = ref(0)
+const dialog = ref(false)
 
 const list_selector = computed(() => Object.keys(app.nameLists))
 
@@ -130,6 +155,16 @@ const currentList = computed({
     currentListData.value = newValue
   },
 })
+
+const batchResults = computed(() => {
+  if (mode.value === '2' && Array.isArray(result.value)) {
+    return result.value
+  }
+  return []
+})
+
+const count = computed(() => currentList.value?.length || 0)
+const chips = computed(() => currentList.value || [])
 
 const selected = computed({
   get() {
@@ -168,6 +203,28 @@ const batchCount = computed({
     app.updateSettingsNumber('batchCount', newValue)
   },
 })
+
+watch(
+  () => isRunning.value,
+  (newValue) => {
+    if (newValue && mode.value !== '2') {
+      const interval = setInterval(() => {
+        textIndex.value = (textIndex.value + 1) % (currentList.value?.length || 1)
+        displayText.value = currentList.value?.[textIndex.value] || '?'
+      }, 100)
+
+      const unwatch = watch(
+        () => isRunning.value,
+        (stillRunning) => {
+          if (!stillRunning) {
+            clearInterval(interval)
+            unwatch()
+          }
+        }
+      )
+    }
+  }
+)
 
 const startRunning = () => {
   isRunning.value = true
@@ -229,6 +286,3 @@ const randomBatch = () => {
   }
 }
 </script>
-
-<style scoped></style>
-
