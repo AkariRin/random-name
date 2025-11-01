@@ -238,9 +238,19 @@
                 <v-btn @click="createListDialog = true" color="success" class="mr-2">
                   <v-icon start>mdi-plus</v-icon>创建名单
                 </v-btn>
+                <v-btn @click="importListFileOpen" color="info" class="mr-2">
+                  <v-icon start>mdi-upload</v-icon>导入名单
+                </v-btn>
                 <v-btn @click="deleteConfirm('allLists')" color="error">
                   <v-icon start>mdi-delete</v-icon>删除所有名单
                 </v-btn>
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="*"
+                  style="display: none"
+                  @change="handleFileImport"
+                />
               </div>
               <v-expansion-panels>
                 <v-expansion-panel v-for="(values, listName) in namelists" :key="listName">
@@ -346,6 +356,30 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <v-dialog v-model="importListDialog" max-width="600px">
+          <v-card>
+            <v-card-title>导入名单</v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="importListName"
+                label="名单名称"
+                placeholder="请输入要导入到的名单名称"
+                filled
+                clearable
+              ></v-text-field>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="importListDialog = false" color="primary">
+                <v-icon start>mdi-close</v-icon>取消
+              </v-btn>
+              <v-btn color="info" @click="importListExec" :disabled="!importListName.trim()">
+                <v-icon start>mdi-upload</v-icon>导入
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-container>
     </v-main>
   </v-app>
@@ -381,6 +415,9 @@ const targetList = ref('')
 const targetIndex = ref(-1)
 const createListDialog = ref(false)
 const newListName = ref('')
+const fileInput = ref(null)
+const importListDialog = ref(false)
+const importListName = ref('')
 
 const rules = [
   (value) => !!value || '不能为空',
@@ -652,5 +689,59 @@ const deleteExec = (action) => {
   deleteType.value = 'list'
   targetIndex.value = -1
   deleteDialog.value = false
+}
+
+const importListFileOpen = () => {
+  importListName.value = ''
+  importListDialog.value = true
+}
+
+const importListExec = () => {
+  if (!importListName.value.trim()) {
+    return
+  }
+
+  // 打开文件选择器
+  fileInput.value?.click()
+}
+
+const handleFileImport = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) {
+    importListDialog.value = false
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const content = e.target?.result
+    if (typeof content !== 'string') {
+      importListDialog.value = false
+      return
+    }
+
+    // 按行分割，并过滤空行和仅有空格的行
+    const names = content
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line)
+
+    // 如果名单不存在，创建它
+    if (!namelists.value[importListName.value]) {
+      namelists.value[importListName.value] = []
+    }
+
+    // 将所有名字添加到名单中
+    names.forEach((name) => {
+      namelists.value[importListName.value].push({ name })
+    })
+
+    importListDialog.value = false
+    importListName.value = ''
+  }
+
+  reader.readAsText(file)
+  // 重置文件输入
+  event.target.value = ''
 }
 </script>
